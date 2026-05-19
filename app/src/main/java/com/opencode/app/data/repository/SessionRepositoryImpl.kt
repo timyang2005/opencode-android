@@ -44,7 +44,7 @@ class SessionRepositoryImpl @Inject constructor() : SessionRepository {
                     parts = listOf(
                         MessagePart.Text("好的，我来帮你创建项目。首先配置 build.gradle.kts，添加 Compose 和 Hilt 依赖。"),
                         MessagePart.Code(
-                            code = "// build.gradle.kts (app level)\nplugins {\n    id(\"com.android.application\")\n    id(\"org.jetbrains.kotlin.android\")\n    id(\"com.google.dagger.hilt.android\")\n    id(\"org.jetbrains.kotlin.kapt\")\n}\n\nandroid {\n    namespace = \"com.example.myapp\"\n    compileSdk = 34\n    defaultConfig {\n        applicationId = \"com.example.myapp\"\n        minSdk = 24\n        targetSdk = 34\n    }\n    buildFeatures { compose = true }\n}",
+                            code = "// build.gradle.kts (app level)\nplugins {\n    id(\"com.android.application\")\n    id(\"org.jetbrains.kotlin.android\")\n    id(\"com.google.dagger.hilt.android\")\n    id(\"com.google.devtools.ksp\")\n}\n\nandroid {\n    namespace = \"com.example.myapp\"\n    compileSdk = 34\n    defaultConfig {\n        applicationId = \"com.example.myapp\"\n        minSdk = 24\n        targetSdk = 34\n    }\n    buildFeatures { compose = true }\n}",
                             language = "kotlin"
                         ),
                         MessagePart.Text("接下来创建 Application 类和 MainActivity，记得在 Manifest 中注册。")
@@ -83,7 +83,8 @@ class SessionRepositoryImpl @Inject constructor() : SessionRepository {
                     id = "msg-002-1",
                     sessionId = "session-002",
                     role = MessageRole.USER,
-                    parts = listOf(MessagePart.Text("帮我在项目中实现 MVVM 架构，包含 ViewModel 和 Repository 层"))
+                    parts = listOf(MessagePart.Text("帮我在项目中实现 MVVM 架构，包含 ViewModel 和 Repository 层")),
+                    createdAt = now.minusSeconds(86400)
                 ),
                 Message(
                     id = "msg-002-2",
@@ -114,7 +115,8 @@ class SessionRepositoryImpl @Inject constructor() : SessionRepository {
                     id = "msg-003-1",
                     sessionId = "session-003",
                     role = MessageRole.USER,
-                    parts = listOf(MessagePart.Text("帮我添加 Retrofit 网络请求层，包含拦截器和错误处理"))
+                    parts = listOf(MessagePart.Text("帮我添加 Retrofit 网络请求层，包含拦截器和错误处理")),
+                    createdAt = now.minusSeconds(172800)
                 ),
                 Message(
                     id = "msg-003-2",
@@ -135,9 +137,9 @@ class SessionRepositoryImpl @Inject constructor() : SessionRepository {
                     id = "msg-003-3",
                     sessionId = "session-003",
                     role = MessageRole.USER,
-                    parts = listOf(MessagePart.Text("继续，添加 API 接口和统一的错误处理"))
-                ),
-                createdAt = now.minusSeconds(86400)
+                    parts = listOf(MessagePart.Text("继续，添加 API 接口和统一的错误处理")),
+                    createdAt = now.minusSeconds(86400)
+                )
             )
         )
     )
