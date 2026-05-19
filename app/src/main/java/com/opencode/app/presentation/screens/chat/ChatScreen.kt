@@ -239,7 +239,7 @@ fun ChatScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(16.dp),
-                                horizontalArrangement = Arrangement.CenterHorizontally
+                                horizontalArrangement = Arrangement.Center
                             ) {
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(24.dp),
@@ -268,11 +268,11 @@ private fun MessageBubble(message: Message) {
         MessageRole.ASSISTANT -> MaterialTheme.colorScheme.secondaryContainer
     }
 
-    val alignment = if (isUser) Alignment.CenterEnd else Alignment.CenterStart
+    val horizontalAlignment: Alignment.Horizontal = if (isUser) Alignment.End else Alignment.Start
 
     Column(
         modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = alignment
+        horizontalAlignment = horizontalAlignment
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
