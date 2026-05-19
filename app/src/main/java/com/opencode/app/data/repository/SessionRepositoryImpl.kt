@@ -42,75 +42,21 @@ class SessionRepositoryImpl @Inject constructor() : SessionRepository {
                     sessionId = "session-001",
                     role = MessageRole.ASSISTANT,
                     parts = listOf(
-                        MessagePart.Text("好的，我来帮你创建一个使用 Kotlin + Jetpack Compose + Hilt 的 Android 项目。以下是项目的基本结构和配置："),
+                        MessagePart.Text("好的，我来帮你创建项目。首先配置 build.gradle.kts，添加 Compose 和 Hilt 依赖。"),
                         MessagePart.Code(
-                            code = """// build.gradle.kts (Project level)
-plugins {
-    id("com.android.application") version "8.2.0" apply false
-    id("org.jetbrains.kotlin.android") version "1.9.20" apply false
-    id("com.google.dagger.hilt.android") version "2.48" apply false
-    id("org.jetbrains.kotlin.kapt") version "1.9.20" apply false
-}""",
+                            code = "// build.gradle.kts (app level)\nplugins {\n    id(\"com.android.application\")\n    id(\"org.jetbrains.kotlin.android\")\n    id(\"com.google.dagger.hilt.android\")\n    id(\"org.jetbrains.kotlin.kapt\")\n}\n\nandroid {\n    namespace = \"com.example.myapp\"\n    compileSdk = 34\n    defaultConfig {\n        applicationId = \"com.example.myapp\"\n        minSdk = 24\n        targetSdk = 34\n    }\n    buildFeatures { compose = true }\n}",
                             language = "kotlin"
                         ),
-                        MessagePart.Code(
-                            code = """// build.gradle.kts (App level)
-plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("com.google.dagger.hilt.android")
-    id("org.jetbrains.kotlin.kapt")
-}
-
-android {
-    namespace = "com.example.myapp"
-    compileSdk = 34
-
-    defaultConfig {
-        applicationId = "com.example.myapp"
-        minSdk = 24
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
-    }
-
-    buildFeatures {
-        compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.5"
-    }
-}
-
-dependencies {
-    // Compose
-    implementation(platform("androidx.compose:compose-bom:2023.10.01"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.material3:material3")
-
-    // Hilt
-    implementation("com.google.dagger:hilt-android:2.48")
-    kapt("com.google.dagger:hilt-compiler:2.48")
-    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
-}""",
-                            language = "kotlin"
-                        ),
-                        MessagePart.Text("项目已创建完成。接下来你需要配置 `AndroidManifest.xml` 和创建 `Application` 类来启用 Hilt。需要我继续吗？")
+                        MessagePart.Text("接下来创建 Application 类和 MainActivity，记得在 Manifest 中注册。")
                     ),
                     createdAt = now.minusSeconds(3600 * 2 + 30),
-                    model = ModelInfo(
-                        providerId = "openai",
-                        modelId = "gpt-4",
-                        displayName = "GPT-4"
-                    )
+                    model = ModelInfo(providerId = "openai", modelId = "gpt-4", displayName = "GPT-4")
                 ),
                 Message(
                     id = "msg-001-3",
                     sessionId = "session-001",
                     role = MessageRole.USER,
-                    parts = listOf(
-                        MessagePart.Text("继续，帮我写 Application 类和 MainActivity")
-                    ),
+                    parts = listOf(MessagePart.Text("继续，帮我写 MainActivity")),
                     createdAt = now.minusSeconds(3600)
                 ),
                 Message(
@@ -118,55 +64,10 @@ dependencies {
                     sessionId = "session-001",
                     role = MessageRole.ASSISTANT,
                     parts = listOf(
-                        MessagePart.Code(
-                            code = """package com.example.myapp
-
-import android.app.Application
-import dagger.hilt.android.HiltAndroidApp
-
-@HiltAndroidApp
-class MyApplication : Application()""",
-                            language = "kotlin"
-                        ),
-                        MessagePart.Code(
-                            code = """package com.example.myapp
-
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
-import com.example.myapp.ui.theme.MyAppTheme
-import dagger.hilt.android.AndroidEntryPoint
-
-@AndroidEntryPoint
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            MyAppTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    GreetingScreen()
-                }
-            }
-        }
-    }
-}""",
-                            language = "kotlin"
-                        ),
-                        MessagePart.Text("完成！记得在 `AndroidManifest.xml` 中添加 `android:name=\".MyApplication\"` 到 `<application>` 标签。")
+                        MessagePart.Text("MainActivity 已创建完成，使用 setContent 配置 Compose 主题和 Scaffold。项目基础架构搭建完毕。")
                     ),
                     createdAt = now.minusSeconds(3600 - 30),
-                    model = ModelInfo(
-                        providerId = "openai",
-                        modelId = "gpt-4",
-                        displayName = "GPT-4"
-                    )
+                    model = ModelInfo(providerId = "openai", modelId = "gpt-4", displayName = "GPT-4")
                 )
             )
         ),
@@ -182,69 +83,22 @@ class MainActivity : ComponentActivity() {
                     id = "msg-002-1",
                     sessionId = "session-002",
                     role = MessageRole.USER,
-                    parts = listOf(
-                        MessagePart.Text("帮我在项目中实现 MVVM 架构，包含 ViewModel 和 Repository 层")
-                    ),
-                    createdAt = now.minusSeconds(86400)
+                    parts = listOf(MessagePart.Text("帮我在项目中实现 MVVM 架构，包含 ViewModel 和 Repository 层"))
                 ),
                 Message(
                     id = "msg-002-2",
                     sessionId = "session-002",
                     role = MessageRole.ASSISTANT,
                     parts = listOf(
-                        MessagePart.Text("好的，我来帮你搭建 MVVM 架构。首先创建 Repository 层："),
+                        MessagePart.Text("好的，MVVM 架构包含三层："),
                         MessagePart.Code(
-                            code = """package com.example.myapp.domain.repository
-
-import kotlinx.coroutines.flow.Flow
-
-interface UserRepository {
-    fun getUserProfile(): Flow<UserProfile>
-    suspend fun updateUserName(name: String): Result<Unit>
-}""",
-                            language = "kotlin"
-                        ),
-                        MessagePart.Code(
-                            code = """package com.example.myapp.ui.viewmodel
-
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.myapp.domain.repository.UserRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
-import javax.inject.Inject
-
-@HiltViewModel
-class UserViewModel @Inject constructor(
-    private val userRepository: UserRepository
-) : ViewModel() {
-
-    val userProfile: StateFlow<UserProfile> = userRepository.getUserProfile()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = UserProfile()
-        )
-
-    fun updateName(name: String) {
-        viewModelScope.launch {
-            userRepository.updateUserName(name)
-        }
-    }
-}""",
+                            code = "// Repository 接口\ninterface UserRepository {\n    fun getUserProfile(): Flow<UserProfile>\n    suspend fun updateUserName(name: String)\n}\n\n// ViewModel\n@HiltViewModel\nclass UserViewModel @Inject constructor(\n    private val repository: UserRepository\n) : ViewModel() {\n    val profile = repository.getUserProfile()\n        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UserProfile())\n}",
                             language = "kotlin"
                         ),
                         MessagePart.Text("MVVM 架构已搭建完成。Repository 负责数据获取，ViewModel 处理 UI 逻辑并通过 StateFlow 暴露状态给 Compose。")
                     ),
                     createdAt = now.minusSeconds(86400 - 60),
-                    model = ModelInfo(
-                        providerId = "anthropic",
-                        modelId = "claude-3-sonnet",
-                        displayName = "Claude 3 Sonnet"
-                    )
+                    model = ModelInfo(providerId = "anthropic", modelId = "claude-3-sonnet", displayName = "Claude 3 Sonnet")
                 )
             )
         ),
@@ -260,70 +114,30 @@ class UserViewModel @Inject constructor(
                     id = "msg-003-1",
                     sessionId = "session-003",
                     role = MessageRole.USER,
-                    parts = listOf(
-                        MessagePart.Text("帮我添加 Retrofit 网络请求层，包含拦截器和错误处理")
-                    ),
-                    createdAt = now.minusSeconds(172800)
+                    parts = listOf(MessagePart.Text("帮我添加 Retrofit 网络请求层，包含拦截器和错误处理"))
                 ),
                 Message(
                     id = "msg-003-2",
                     sessionId = "session-003",
                     role = MessageRole.ASSISTANT,
                     parts = listOf(
-                        MessagePart.Text("好的，我来帮你配置完整的网络请求层。首先创建 DI 模块："),
+                        MessagePart.Text("好的，我来帮你配置网络请求层。创建了 NetworkModule 提供 OkHttpClient 和 Retrofit 实例，包含日志拦截器和超时配置。"),
                         MessagePart.Code(
-                            code = """@Module
-@InstallIn(SingletonComponent::class)
-object NetworkModule {
-
-    @Provides
-    @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
-            .addInterceptor { chain ->
-                val request = chain.request().newBuilder()
-                    .addHeader("Content-Type", "application/json")
-                    .build()
-                chain.proceed(request)
-            }
-            .addInterceptor(HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
-            })
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl("https://api.example.com/")
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
-}""",
+                            code = "// NetworkModule.kt\n@Module\n@InstallIn(SingletonComponent::class)\nobject NetworkModule {\n    @Provides @Singleton\n    fun provideOkHttpClient(): OkHttpClient = OkHttpClient.Builder()\n        .addInterceptor(HttpLoggingInterceptor())\n        .connectTimeout(30, TimeUnit.SECONDS)\n        .build()\n\n    @Provides @Singleton\n    fun provideRetrofit(client: OkHttpClient): Retrofit = Retrofit.Builder()\n        .baseUrl(\"https://api.example.com/\")\n        .client(client)\n        .addConverterFactory(GsonConverterFactory.create())\n        .build()\n}",
                             language = "kotlin"
                         ),
-                        MessagePart.Text("网络层配置完成。包含了请求头拦截器、日志拦截器和超时配置。需要我继续添加 API 接口定义和错误处理吗？")
+                        MessagePart.Text("网络层配置完成。需要我继续添加 API 接口定义和错误处理吗？")
                     ),
                     createdAt = now.minusSeconds(172800 - 45),
-                    model = ModelInfo(
-                        providerId = "openai",
-                        modelId = "gpt-4",
-                        displayName = "GPT-4"
-                    )
+                    model = ModelInfo(providerId = "openai", modelId = "gpt-4", displayName = "GPT-4")
                 ),
                 Message(
                     id = "msg-003-3",
                     sessionId = "session-003",
                     role = MessageRole.USER,
-                    parts = listOf(
-                        MessagePart.Text("继续，添加 API 接口和统一的错误处理")
-                    ),
-                    createdAt = now.minusSeconds(86400)
-                )
+                    parts = listOf(MessagePart.Text("继续，添加 API 接口和统一的错误处理"))
+                ),
+                createdAt = now.minusSeconds(86400)
             )
         )
     )
@@ -357,10 +171,7 @@ object NetworkModule {
     override fun updateSession(id: String, title: String): Flow<Boolean> = flow {
         val index = mockSessions.indexOfFirst { it.id == id }
         if (index != -1) {
-            mockSessions[index] = mockSessions[index].copy(
-                title = title,
-                updatedAt = Instant.now()
-            )
+            mockSessions[index] = mockSessions[index].copy(title = title, updatedAt = Instant.now())
             emit(true)
         } else {
             emit(false)
