@@ -106,15 +106,3 @@ jobs:
       with:
         name: release-apk
         path: app/build/outputs/apk/release/*.apk
-        
-    - name: Create GitHub Release
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: v1.0.0-${{ github.run_number }}
-        name: Release v1.0.0-${{ github.run_number }}
-        body: "Automated release build #${{ github.run_number }}"
-        files: app/build/outputs/apk/release/*-signed.apk
-        draft: false
-        prerelease: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
