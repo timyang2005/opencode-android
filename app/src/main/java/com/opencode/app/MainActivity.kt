@@ -4,11 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
+import com.opencode.app.presentation.screens.main.MainScreen
 import com.opencode.app.ui.theme.OpenCodeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -19,11 +21,15 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             OpenCodeTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Text("OpenCode Android")
+                Scaffold(
+                    contentWindowInsets = WindowInsets(0, 0, 0, 0)
+                ) { innerPadding ->
+                    Surface(
+                        modifier = Modifier.padding(innerPadding),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        MainScreen()
+                    }
                 }
             }
         }
