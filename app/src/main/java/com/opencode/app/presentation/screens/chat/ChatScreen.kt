@@ -239,7 +239,7 @@ fun ChatScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(16.dp),
-                                horizontalArrangement = Arrangement.Center
+                                horizontalArrangement = Arrangement.CenterHorizontally
                             ) {
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(24.dp),
