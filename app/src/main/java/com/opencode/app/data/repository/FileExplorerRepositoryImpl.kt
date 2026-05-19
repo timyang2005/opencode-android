@@ -13,9 +13,6 @@ class FileExplorerRepositoryImpl @Inject constructor() : FileExplorerRepository 
 
     private val now = Instant.now()
 
-    /**
-     * Mock 虚拟文件树，模拟典型 Android 项目结构
-     */
     private val fileTree = mutableMapOf(
         "" to listOf(
             FileInfo("app/", "app", true, 4096, now),
@@ -111,8 +108,7 @@ class FileExplorerRepositoryImpl @Inject constructor() : FileExplorerRepository 
         "app/src/main/res/" to listOf(
             FileInfo("app/src/main/res/drawable/", "drawable", true, 4096, now),
             FileInfo("app/src/main/res/mipmap-anydpi-v26/", "mipmap-anydpi-v26", true, 4096, now),
-            FileInfo("app/src/main/res/values/", "values", true, 4096, now),
-            FileInfo("app/src/main/res/layout/", "layout", true, 4096, now)
+            FileInfo("app/src/main/res/values/", "values", true, 4096, now)
         ),
         "app/src/main/res/values/" to listOf(
             FileInfo("app/src/main/res/values/colors.xml", "colors.xml", false, 512, now),
@@ -125,157 +121,40 @@ class FileExplorerRepositoryImpl @Inject constructor() : FileExplorerRepository 
         "gradle/wrapper/" to listOf(
             FileInfo("gradle/wrapper/gradle-wrapper.jar", "gradle-wrapper.jar", false, 65536, now),
             FileInfo("gradle/wrapper/gradle-wrapper.properties", "gradle-wrapper.properties", false, 128, now)
-        ),
-        "app/src/test/" to listOf(
-            FileInfo("app/src/test/java/", "java", true, 4096, now)
-        ),
-        "app/src/androidTest/" to listOf(
-            FileInfo("app/src/androidTest/java/", "java", true, 4096, now)
         )
     )
 
-    /**
-     * Mock 文件内容
-     */
     private val fileContents = mapOf(
-        "build.gradle.kts" to """// Top-level build file
-plugins {
-    id("com.android.application") version "8.2.0" apply false
-    id("org.jetbrains.kotlin.android") version "1.9.20" apply false
-    id("com.google.dagger.hilt.android") version "2.48" apply false
-    id("org.jetbrains.kotlin.kapt") version "1.9.20" apply false
-}""",
-        "settings.gradle.kts" to """pluginManagement {
-    repositories {
-        google()
-        mavenCentral()
-        gradlePluginPortal()
-    }
-}
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-
-rootProject.name = "OpenCodeAndroidApp"
-include(":app")""",
-        "gradle.properties" to """org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
-android.useAndroidX=true
-kotlin.code.style=official
-android.nonTransitiveRClass=true""",
-        "app/build.gradle.kts" to """plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("com.google.dagger.hilt.android")
-    id("org.jetbrains.kotlin.kapt")
-}
-
-android {
-    namespace = "com.opencode.app"
-    compileSdk = 34
-
-    defaultConfig {
-        applicationId = "com.opencode.app"
-        minSdk = 24
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
-    }
-
-    buildFeatures {
-        compose = true
-    }
-}
-
-dependencies {
-    // Compose BOM
-    implementation(platform("androidx.compose:compose-bom:2023.10.01"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.material3:material3")
-
-    // Hilt
-    implementation("com.google.dagger:hilt-android:2.48")
-    kapt("com.google.dagger:hilt-compiler:2.48")
-
-    // Retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-
-    // DataStore
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
-}""",
-        "app/src/main/AndroidManifest.xml" to """<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <uses-permission android:name="android.permission.INTERNET" />
-
-    <application
-        android:name=".OpenCodeApplication"
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/Theme.OpenCode">
-        <activity
-            android:name=".MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-    </application>
-
-</manifest>"""
+        "build.gradle.kts" to "// Top-level build file\nplugins {\n    id(\"com.android.application\") version \"8.2.0\" apply false\n    id(\"org.jetbrains.kotlin.android\") version \"1.9.20\" apply false\n}",
+        "settings.gradle.kts" to "pluginManagement {\n    repositories { google(); mavenCentral() }\n}\nrootProject.name = \"OpenCode\"\ninclude(\":app\")",
+        "gradle.properties" to "org.gradle.jvmargs=-Xmx2048m\nandroid.useAndroidX=true\nkotlin.code.style=official"
     )
 
     override fun getFiles(path: String): Flow<List<FileInfo>> = flow {
-        // 标准化路径：确保以 / 结尾（目录）
         val normalizedPath = if (path.isNotEmpty() && !path.endsWith("/")) "$path/" else path
-        val files = fileTree[path]
-        if (files != null) {
-            emit(files)
-        } else {
-            // 尝试匹配不带尾部斜杠的路径
-            emit(fileTree[path.removeSuffix("/")] ?: emptyList())
-        }
+        emit(fileTree[normalizedPath] ?: fileTree[path.removeSuffix("/")] ?: emptyList())
     }
 
     override fun getFileContent(path: String): Flow<String?> = flow {
-        // 尝试从多个可能的 key 中查找
-        val content = fileContents[path]
-            ?: fileContents[path.removePrefix("./")]
-            ?: fileContents[path.removePrefix("/")]
-        emit(content)
+        emit(fileContents[path] ?: fileContents[path.removePrefix("./")] ?: fileContents[path.removePrefix("/")])
     }
 
     override fun createFile(path: String, name: String): Flow<Boolean> = flow {
-        try {
-            val normalizedPath = if (path.isNotEmpty() && !path.endsWith("/")) "$path/" else path
-            val existingFiles = fileTree[normalizedPath]?.toMutableList() ?: mutableListOf()
-            val fullPath = if (normalizedPath.endsWith("/")) "$normalizedPath$name" else "$normalizedPath/$name"
-            existingFiles.add(FileInfo("$fullPath", name, false, 0, Instant.now()))
-            fileTree[normalizedPath] = existingFiles
-            emit(true)
-        } catch (e: Exception) {
-            emit(false)
-        }
+        val normalizedPath = if (path.isNotEmpty() && !path.endsWith("/")) "$path/" else path
+        val existingFiles = fileTree[normalizedPath]?.toMutableList() ?: mutableListOf()
+        val fullPath = "$normalizedPath$name"
+        existingFiles.add(FileInfo(fullPath, name, false, 0, Instant.now()))
+        fileTree[normalizedPath] = existingFiles
+        emit(true)
     }
 
     override fun createFolder(path: String, name: String): Flow<Boolean> = flow {
-        try {
-            val normalizedPath = if (path.isNotEmpty() && !path.endsWith("/")) "$path/" else path
-            val existingFiles = fileTree[normalizedPath]?.toMutableList() ?: mutableListOf()
-            val fullPath = if (normalizedPath.endsWith("/")) "$normalizedPath$name" else "$normalizedPath/$name"
-            existingFiles.add(FileInfo("$fullPath/", name, true, 4096, Instant.now()))
-            fileTree[normalizedPath] = existingFiles
-            fileTree[fullPath] = emptyList()
-            emit(true)
-        } catch (e: Exception) {
-            emit(false)
-        }
+        val normalizedPath = if (path.isNotEmpty() && !path.endsWith("/")) "$path/" else path
+        val existingFiles = fileTree[normalizedPath]?.toMutableList() ?: mutableListOf()
+        val fullPath = "$normalizedPath$name/"
+        existingFiles.add(FileInfo(fullPath, name, true, 4096, Instant.now()))
+        fileTree[normalizedPath] = existingFiles
+        fileTree[fullPath] = emptyList()
+        emit(true)
     }
 }
