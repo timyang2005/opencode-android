@@ -5,20 +5,3 @@ plugins {
     id("com.google.dagger.hilt.android") version "2.48" apply false
     id("org.jetbrains.kotlin.kapt") version "1.9.20" apply false
 }
-
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath("com.google.dagger:hilt-android-gradle-plugin:2.48")
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
