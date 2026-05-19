@@ -99,7 +99,7 @@ jobs:
         keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
         keyPassword: ${{ secrets.KEY_PASSWORD }}
       env:
-        BUILD_TOOLS_VERSION: "34.0.0"
+        BUILD_TOOLS_VERSION: '34.0.0'
         
     - name: Upload Release APK
       uses: actions/upload-artifact@v4
@@ -110,8 +110,8 @@ jobs:
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: "v1.0.0-${{ github.run_number }}"
-        name: "Release v1.0.0-${{ github.run_number }}"
+        tag_name: v1.0.0-${{ github.run_number }}
+        name: Release v1.0.0-${{ github.run_number }}
         body: "Automated release build #${{ github.run_number }}"
         files: app/build/outputs/apk/release/*-signed.apk
         draft: false
