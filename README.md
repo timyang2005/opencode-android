@@ -1,65 +1,34 @@
-name: Android CI/CD
+# OpenCode Android
 
-on:
-  push:
-    branches: [main]
-    tags: ['v*']
-  workflow_dispatch:
+在手机上同步 OpenCode 会话并进行对话的 Android 客户端。
 
-jobs:
-  build-and-release:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
+## 功能特性
 
-    - uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: temurin
+- 🔄 会话同步 - 与 OpenCode 桌面端实时同步会话
+- 💬 智能对话 - 支持多轮对话，代码高亮显示
+- 📁 文件浏览 - 浏览和管理项目文件
+- ⚙️ 服务器配置 - 灵活配置连接参数
+- 🌙 深色模式 - 支持 Material Design 3 主题
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+## 技术栈
 
-    - name: Build Debug APK
-      run: ./gradlew assembleDebug
+- Kotlin + Jetpack Compose (Material Design 3)
+- MVVM + Clean Architecture
+- Hilt 依赖注入
+- Room 数据库 + DataStore
+- Retrofit + OkHttp 网络请求
+- KSP 注解处理
 
-    - uses: actions/upload-artifact@v4
-      with:
-        name: debug-apk
-        path: app/build/outputs/apk/debug/*.apk
+## 构建要求
 
-    - name: Decode keystore
-      run: echo "${{ secrets.SIGNING_KEY }}" | base64 -d > app/release.keystore
+- Android SDK 34
+- JDK 17
+- Gradle 8.2
 
-    - name: Build Release APK
-      run: ./gradlew assembleRelease
-      env:
-        KEYSTORE_FILE: release.keystore
-        KEYSTORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
-        KEY_ALIAS: ${{ secrets.ALIAS }}
-        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+## 下载
 
-    - name: Sign APK
-      uses: r0adkll/sign-android-release@v1
-      id: sign_apk
-      with:
-        releaseDirectory: app/build/outputs/apk/release
-        signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-        alias: ${{ secrets.ALIAS }}
-        keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-        keyPassword: ${{ secrets.KEY_PASSWORD }}
+前往 [Releases](https://github.com/timyang2005/opencode-android/releases) 下载最新版本。
 
-    - name: Upload Release APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: release-apk
-        path: ${{ steps.sign_apk.outputs.signedReleaseFile }}
+## License
 
-    - name: Create GitHub Release
-      if: startsWith(github.ref, 'refs/tags/v')
-      uses: softprops/action-gh-release@v2
-      with:
-        files: ${{ steps.sign_apk.outputs.signedReleaseFile }}
-        generate_release_notes: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+MIT
