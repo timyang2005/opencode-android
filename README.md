@@ -1,23 +1,65 @@
-# OpenCode Android App
+name: Android CI/CD
 
-一个功能完整的原生Android应用，用于在手机上同步OpenCode会话并进行对话。
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
 
-## 功能特性
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
 
-- 🔐 用户认证：支持HTTP Basic Auth和Token认证
-- 💬 Session同步：实时同步OpenCode会话列表
-- 📝 对话功能：发送消息、接收AI回复、查看历史记录
-- 🔍 Session管理：创建、删除、重命名会话
-- 📂 代码浏览：查看项目文件和代码
-- ⚙️ 设置同步：同步用户偏好设置
+    - uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: temurin
 
-## 技术栈
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
 
-- Kotlin + Jetpack Compose
-- MVVM + Clean Architecture
-- Retrofit + OkHttp + WebSocket
-- Room Database + Hilt
+    - name: Build Debug APK
+      run: ./gradlew assembleDebug
 
-## 仓库地址
+    - uses: actions/upload-artifact@v4
+      with:
+        name: debug-apk
+        path: app/build/outputs/apk/debug/*.apk
 
-https://github.com/timyang2005/opencode-android
+    - name: Decode keystore
+      run: echo "${{ secrets.SIGNING_KEY }}" | base64 -d > app/release.keystore
+
+    - name: Build Release APK
+      run: ./gradlew assembleRelease
+      env:
+        KEYSTORE_FILE: release.keystore
+        KEYSTORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+        KEY_ALIAS: ${{ secrets.ALIAS }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+    - name: Sign APK
+      uses: r0adkll/sign-android-release@v1
+      id: sign_apk
+      with:
+        releaseDirectory: app/build/outputs/apk/release
+        signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+        alias: ${{ secrets.ALIAS }}
+        keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+        keyPassword: ${{ secrets.KEY_PASSWORD }}
+
+    - name: Upload Release APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-apk
+        path: ${{ steps.sign_apk.outputs.signedReleaseFile }}
+
+    - name: Create GitHub Release
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ${{ steps.sign_apk.outputs.signedReleaseFile }}
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
